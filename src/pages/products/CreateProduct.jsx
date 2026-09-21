@@ -18,14 +18,19 @@ export default function CreateProduct() {
     const { data: categories = [] } = useCategories();
 
     const [sections, setSections] = useState([
-        { title: 'Product Details', content: '' },
-        { title: 'Care Instructions', content: '' },
-        { title: 'Shipping & Delivery Policy', content: '' }
+        { title: 'How to Use', content: '' },
+        { title: 'Ingredients & Nutrition', content: '' },
+        { title: 'Safety & Storage', content: '' },
+        { title: 'Shipping & Delivery', content: '' }
     ]);
 
     const [formData, setFormData] = useState({
         sku: '',
         name: '',
+        subtitle: '',
+        shortDescription: '',
+        packSize: '',
+        featuredTag: '',
         description: '',
         mrp: '',
         price: '',
@@ -33,6 +38,9 @@ export default function CreateProduct() {
         categoryId: '',
         stock: '',
         images: [],
+        ingredients: '',
+        benefits: '',
+        keyPoints: '',
         availableSizes: [],
         availableColors: [],
         isTrending: false,
@@ -169,9 +177,25 @@ export default function CreateProduct() {
         e.preventDefault();
         if (!validate()) return;
 
+        const parseList = (value) => {
+            if (!value) return [];
+            if (Array.isArray(value)) return value.filter(Boolean).map(item => String(item).trim());
+            return value
+                .split(',')
+                .map(item => item.trim())
+                .filter(Boolean);
+        };
+
         const productData = {
             ...formData,
+            subtitle: formData.subtitle?.trim(),
+            shortDescription: formData.shortDescription?.trim(),
+            packSize: formData.packSize?.trim(),
+            featuredTag: formData.featuredTag?.trim(),
             additionalSections: sections,
+            ingredients: parseList(formData.ingredients),
+            benefits: parseList(formData.benefits),
+            keyPoints: parseList(formData.keyPoints),
             mrp: formData.mrp ? parseFloat(formData.mrp) : 0,
             price: parseFloat(formData.price),
             discount: formData.discount ? parseFloat(formData.discount) : 0,
@@ -235,7 +259,7 @@ export default function CreateProduct() {
                                                 name="sku"
                                                 value={formData.sku}
                                                 onChange={handleChange}
-                                                placeholder="e.g. LUG-SAR-001"
+                                                placeholder="e.g. AYV-FIB-150"
                                                 className={`border-gray-300 ${errors.sku ? 'border-red-500' : ''}`}
                                             />
                                             {errors.sku && <p className="text-sm text-red-500 mt-1">{errors.sku}</p>}
@@ -250,7 +274,7 @@ export default function CreateProduct() {
                                                 name="name"
                                                 value={formData.name}
                                                 onChange={handleChange}
-                                                placeholder="e.g., Banarasi Silk Saree"
+                                                placeholder="e.g., Ayurveda Fiber - Natural Sugar Control"
                                                 className={`border-gray-300 ${errors.name ? 'border-red-500' : ''}`}
                                             />
                                             {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name}</p>}
@@ -270,6 +294,110 @@ export default function CreateProduct() {
                                                 className={`border-gray-300 resize-none ${errors.description ? 'border-red-500' : ''}`}
                                             />
                                             {errors.description && <p className="text-sm text-red-500 mt-1">{errors.description}</p>}
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <Label htmlFor="subtitle" className="text-sm font-medium text-gray-700 mb-2 block">
+                                                    Subtitle
+                                                </Label>
+                                                <Input
+                                                    id="subtitle"
+                                                    name="subtitle"
+                                                    value={formData.subtitle}
+                                                    onChange={handleChange}
+                                                    placeholder="e.g. Pure wild honey"
+                                                    className="border-gray-300"
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <Label htmlFor="packSize" className="text-sm font-medium text-gray-700 mb-2 block">
+                                                    Pack Size
+                                                </Label>
+                                                <Input
+                                                    id="packSize"
+                                                    name="packSize"
+                                                    value={formData.packSize}
+                                                    onChange={handleChange}
+                                                    placeholder="e.g. 250 g | 500 g"
+                                                    className="border-gray-300"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <Label htmlFor="featuredTag" className="text-sm font-medium text-gray-700 mb-2 block">
+                                                    Featured Tag
+                                                </Label>
+                                                <Input
+                                                    id="featuredTag"
+                                                    name="featuredTag"
+                                                    value={formData.featuredTag}
+                                                    onChange={handleChange}
+                                                    placeholder="e.g. Best Seller"
+                                                    className="border-gray-300"
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <Label htmlFor="shortDescription" className="text-sm font-medium text-gray-700 mb-2 block">
+                                                    Short Description
+                                                </Label>
+                                                <Input
+                                                    id="shortDescription"
+                                                    name="shortDescription"
+                                                    value={formData.shortDescription}
+                                                    onChange={handleChange}
+                                                    placeholder="Short product summary"
+                                                    className="border-gray-300"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div>
+                                                <Label htmlFor="ingredients" className="text-sm font-medium text-gray-700 mb-2 block">
+                                                    Ingredients
+                                                </Label>
+                                                <Input
+                                                    id="ingredients"
+                                                    name="ingredients"
+                                                    value={formData.ingredients}
+                                                    onChange={handleChange}
+                                                    placeholder="Raw honey, ginger, lemon"
+                                                    className="border-gray-300"
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <Label htmlFor="benefits" className="text-sm font-medium text-gray-700 mb-2 block">
+                                                    Benefits
+                                                </Label>
+                                                <Input
+                                                    id="benefits"
+                                                    name="benefits"
+                                                    value={formData.benefits}
+                                                    onChange={handleChange}
+                                                    placeholder="Energy, immunity, digestion"
+                                                    className="border-gray-300"
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <Label htmlFor="keyPoints" className="text-sm font-medium text-gray-700 mb-2 block">
+                                                    Key Points
+                                                </Label>
+                                                <Input
+                                                    id="keyPoints"
+                                                    name="keyPoints"
+                                                    value={formData.keyPoints}
+                                                    onChange={handleChange}
+                                                    placeholder="Cold pressed, organic, no additives"
+                                                    className="border-gray-300"
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 </CardContent>
@@ -304,7 +432,7 @@ export default function CreateProduct() {
                                                         <Input
                                                             value={section.title}
                                                             onChange={(e) => handleSectionChange(index, 'title', e.target.value)}
-                                                            placeholder="e.g. Material & Fit"
+                                                            placeholder="e.g. How to Use"
                                                             className="border-gray-300 bg-white"
                                                         />
                                                     </div>
@@ -315,7 +443,7 @@ export default function CreateProduct() {
                                                         <Textarea
                                                             value={section.content}
                                                             onChange={(e) => handleSectionChange(index, 'content', e.target.value)}
-                                                            placeholder="Enter section description here..."
+                                                            placeholder="Add clear instructions or product information..."
                                                             rows={2}
                                                             className="border-gray-300 resize-none bg-white"
                                                         />
@@ -475,7 +603,7 @@ export default function CreateProduct() {
 
                                     <div className="space-y-5">
                                         <div>
-                                            <Label className="text-sm font-medium text-gray-700 mb-3 block">Available Sizes (Press Enter to add)</Label>
+                                            <Label className="text-sm font-medium text-gray-700 mb-3 block">Pack Options (Press Enter to add)</Label>
                                             <div className="flex flex-wrap gap-2 mb-3">
                                                 {formData.availableSizes.map(size => (
                                                     <span key={size} className="px-3 py-1 bg-blue-50 border border-blue-200 text-blue-700 rounded-md text-sm flex items-center gap-2">
@@ -488,7 +616,7 @@ export default function CreateProduct() {
                                             </div>
                                             <Input
                                                 type="text"
-                                                placeholder="e.g. XL, 42, Free Size..."
+                                                placeholder="e.g. 150 g, 30 Sachets, 60 Capsules..."
                                                 className="border-gray-300"
                                                 onKeyDown={(e) => {
                                                     if (e.key === 'Enter') {
@@ -502,7 +630,7 @@ export default function CreateProduct() {
                                         </div>
 
                                         <div>
-                                            <Label className="text-sm font-medium text-gray-700 mb-3 block">Available Colors (Press Enter to add)</Label>
+                                            <Label className="text-sm font-medium text-gray-700 mb-3 block">Variants (Press Enter to add)</Label>
                                             <div className="flex flex-wrap gap-2 mb-3">
                                                 {formData.availableColors.map(color => (
                                                     <span key={color} className="px-3 py-1 bg-green-50 border border-green-200 text-green-700 rounded-md text-sm flex items-center gap-2">
@@ -515,7 +643,7 @@ export default function CreateProduct() {
                                             </div>
                                             <Input
                                                 type="text"
-                                                placeholder="e.g. Navy Blue, Peach..."
+                                                placeholder="e.g. Original, Sugar Control, Herbal..."
                                                 className="border-gray-300"
                                                 onKeyDown={(e) => {
                                                     if (e.key === 'Enter') {
@@ -622,7 +750,7 @@ export default function CreateProduct() {
                                         <li>• Add multiple images for better visibility</li>
                                         <li>• Write detailed descriptions</li>
                                         <li>• Select appropriate category</li>
-                                        <li>• Add size and color variants</li>
+                                        <li>• Add pack sizes or product variants</li>
                                         <li>• Set competitive pricing</li>
                                     </ul>
                                 </CardContent>
@@ -638,7 +766,7 @@ export default function CreateProduct() {
                 onClose={() => setCropperOpen(false)}
                 imageSrc={selectedImage}
                 onCropComplete={handleCropComplete}
-                aspectRatio={3 / 4} // Vertical crop for fashion products
+                aspectRatio={3 / 4}
                 targetWidth={900}
                 targetHeight={1200}
                 title="Crop Product Image"

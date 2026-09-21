@@ -1,4 +1,4 @@
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export const ORDER_STATUS = {
     PENDING: 'Pending',
@@ -31,13 +31,11 @@ export const PAYMENT_METHODS = {
 };
 
 export const PRODUCT_CATEGORIES = [
-    'Women',
-    'Men',
-    'Kids',
-    'Banarasi Sarees',
-    'Designer Suits',
-    'Kanjivaram',
-    'Party Wear',
+    'Ayurveda Fiber',
+    'Digestive Wellness',
+    'Natural Sugar Control',
+    'Herbal Nutrition',
+    'Daily Wellness',
 ];
 
 export const SORT_OPTIONS = [

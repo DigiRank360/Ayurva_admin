@@ -106,10 +106,9 @@ export default function EditCategory() {
                 },
             });
 
-            // Save only relative path, not full URL
             setFormData(prev => ({
                 ...prev,
-                imageUrl: data.imageUrl, // This is already "/uploads/image-123.jpg"
+                imageUrl: data.imageUrl,
             }));
             setErrors(prev => ({ ...prev, image: '' }));
         } catch (error) {
@@ -234,7 +233,7 @@ export default function EditCategory() {
                                                 name="name"
                                                 value={formData.name}
                                                 onChange={handleChange}
-                                                placeholder="e.g., Sarees, Suits, Lehengas"
+                                                placeholder="e.g., Digestive Wellness, Herbal Nutrition"
                                                 className={`border-gray-300 ${errors.name ? 'border-red-500' : ''}`}
                                             />
                                             {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name}</p>}

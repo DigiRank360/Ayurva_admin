@@ -25,7 +25,7 @@ export default function Login() {
         if (result.success) {
             toast({
                 title: 'Login Successful',
-                description: 'Welcome back to Luga Vastra Admin',
+                description: 'Welcome back to Ayurva PRO Wellness Admin',
             });
             navigate('/dashboard');
         } else {
@@ -60,7 +60,7 @@ export default function Login() {
                             <Input
                                 id="email"
                                 type="email"
-                                placeholder="admin@lugavastra.com"
+                                placeholder="admin@ayurvapro.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required

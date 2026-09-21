@@ -17,7 +17,10 @@ export default function ImageCropper({
     const imgRef = useRef(null);
     const [crop, setCrop] = useState({
         unit: '%',
+        x: 0,
+        y: 0,
         width: 100,
+        height: 100,
         aspect: aspectRatio,
     });
     const [completedCrop, setCompletedCrop] = useState(null);
@@ -26,7 +29,10 @@ export default function ImageCropper({
     useEffect(() => {
         setCrop({
             unit: '%',
+            x: 0,
+            y: 0,
             width: 100,
+            height: 100,
             aspect: aspectRatio,
         });
     }, [aspectRatio, open]);

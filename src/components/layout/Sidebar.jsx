@@ -54,10 +54,10 @@ export default function Sidebar({ onClose }) {
                     </div>
                     <div>
                         <h1 className="text-xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
-                            Luga Vastra
+                            Ayurva PRO
                         </h1>
                         <p className="text-xs text-purple-200 flex items-center gap-1">
-                            <Sparkles className="h-3 w-3" /> Admin Panel
+                            <Sparkles className="h-3 w-3" /> Wellness Admin
                         </p>
                     </div>
                 </div>

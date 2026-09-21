@@ -34,7 +34,7 @@ export default function Header({ onToggleSidebar }) {
 
     const notifications = [
         { id: 1, type: 'order', title: 'New Order #1234', message: 'Order placed by Priya Sharma', time: '2m ago', read: false },
-        { id: 2, type: 'product', title: 'Low Stock Alert', message: 'Banarasi Silk Saree - Only 5 left', time: '15m ago', read: false },
+        { id: 2, type: 'product', title: 'Low Stock Alert', message: 'Ayurveda Fiber - Only 5 left', time: '15m ago', read: false },
         { id: 3, type: 'success', title: 'Product Updated', message: 'Designer Suit Set updated successfully', time: '1h ago', read: true },
         { id: 4, type: 'info', title: 'New Customer', message: '3 new customers registered today', time: '2h ago', read: true },
     ];
