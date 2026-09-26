@@ -192,7 +192,12 @@ export default function CreateProduct() {
             shortDescription: formData.shortDescription?.trim(),
             packSize: formData.packSize?.trim(),
             featuredTag: formData.featuredTag?.trim(),
-            additionalSections: sections,
+            additionalSections: sections
+                .map(section => ({
+                    title: section.title.trim(),
+                    content: section.content.trim(),
+                }))
+                .filter(section => section.title && section.content),
             ingredients: parseList(formData.ingredients),
             benefits: parseList(formData.benefits),
             keyPoints: parseList(formData.keyPoints),
