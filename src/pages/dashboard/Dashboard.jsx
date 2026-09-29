@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { adminAPI } from '@/lib/adminAPI';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import {
     TrendingUp,
     ShoppingCart,
@@ -28,6 +29,11 @@ export default function Dashboard() {
         queryKey: ['dashboardStats'],
         queryFn: adminAPI.getDashboardStats,
         refetchInterval: 30000 // Refresh every 30s
+    });
+    const { data: orderStats, isLoading: isLoadingOrderStats, error: orderStatsError } = useQuery({
+        queryKey: ['dashboardOrderStats'],
+        queryFn: adminAPI.getOrderStats,
+        refetchInterval: 30000
     });
 
     const stats = [
@@ -97,10 +103,19 @@ export default function Dashboard() {
     const topProducts = dashboardData?.topProducts?.map(product => ({
         name: product.name,
         sales: product.sales,
-        revenue: `₹${product.revenue.toLocaleString()}`,
+        revenue: `₹${Number(product.revenue || 0).toLocaleString()}`,
         trend: product.trend,
         rating: product.rating || 4.5
     })) || [];
+
+    const revenueTrend = (orderStats?.dailyOrders || []).map((day) => ({
+        ...day,
+        dateLabel: new Date(`${day._id}T00:00:00`).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+    }));
+    const salesOverview = (dashboardData?.topProducts || []).map((product) => ({
+        name: product.name,
+        units: product.sales,
+    }));
 
     const getStatusBadge = (status) => {
         const badges = {
@@ -184,51 +199,57 @@ export default function Dashboard() {
                 })}
             </div>
 
-            {/* Charts Section - Beautiful Placeholders */}
+            {/* Live analytics */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card className="border-2 border-blue-100 shadow-lg hover:shadow-xl transition-all bg-gradient-to-br from-white to-blue-50/30">
-                    <CardHeader className="border-b border-blue-100 pb-4">
+                <Card className="border border-gray-200 shadow-sm">
+                    <CardHeader className="flex-row items-center justify-between border-b pb-4">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <Activity className="h-5 w-5 text-blue-600" />
+                                <Activity className="h-5 w-5 text-emerald-700" />
                                 <CardTitle className="text-gray-800">Revenue Analytics</CardTitle>
                             </div>
-                            <Badge className="bg-blue-100 text-blue-700 border-0 font-semibold">Last 30 days</Badge>
                         </div>
+                        <Link to="/reports" className="text-sm font-semibold text-emerald-700 hover:text-emerald-900">View reports</Link>
                     </CardHeader>
-                    <CardContent className="p-6">
-                        <div className="h-64 flex items-center justify-center rounded-2xl bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-50 border-2 border-dashed border-blue-200">
-                            <div className="text-center">
-                                <div className="mx-auto w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-3">
-                                    <TrendingUp className="h-8 w-8 text-blue-600" />
-                                </div>
-                                <p className="text-sm font-semibold text-blue-900">Chart coming soon</p>
-                                <p className="text-xs text-blue-600 mt-1">Visualize your revenue trends</p>
-                            </div>
-                        </div>
+                    <CardContent className="p-5">
+                        <p className="mb-3 text-xs text-gray-500">Paid revenue over the last 30 days</p>
+                        {isLoadingOrderStats ? <div className="flex h-64 items-center justify-center text-sm text-gray-500">Loading revenue...</div> : orderStatsError ? <div role="alert" className="flex h-64 items-center justify-center text-sm text-red-700">Revenue data is unavailable.</div> : revenueTrend.length ? (
+                            <ResponsiveContainer width="100%" height={256}>
+                                <LineChart data={revenueTrend} margin={{ top: 8, right: 12, left: -12, bottom: 4 }}>
+                                    <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" vertical={false} />
+                                    <XAxis dataKey="dateLabel" tick={{ fontSize: 11 }} interval="preserveStartEnd" />
+                                    <YAxis tick={{ fontSize: 11 }} tickFormatter={(value) => `₹${Number(value).toLocaleString()}`} />
+                                    <Tooltip formatter={(value) => [`₹${Number(value).toLocaleString()}`, 'Paid revenue']} />
+                                    <Line type="monotone" dataKey="revenue" stroke="#0f766e" strokeWidth={2.5} dot={false} activeDot={{ r: 5 }} />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        ) : <div className="flex h-64 items-center justify-center text-sm text-gray-500">No paid orders in the last 30 days.</div>}
                     </CardContent>
                 </Card>
 
-                <Card className="border-2 border-emerald-100 shadow-lg hover:shadow-xl transition-all bg-gradient-to-br from-white to-emerald-50/30">
-                    <CardHeader className="border-b border-emerald-100 pb-4">
+                <Card className="border border-gray-200 shadow-sm">
+                    <CardHeader className="flex-row items-center justify-between border-b pb-4">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <Award className="h-5 w-5 text-emerald-600" />
+                                <Award className="h-5 w-5 text-amber-700" />
                                 <CardTitle className="text-gray-800">Sales Overview</CardTitle>
                             </div>
-                            <Badge className="bg-emerald-100 text-emerald-700 border-0 font-semibold">This month</Badge>
                         </div>
+                        <Link to="/products" className="text-sm font-semibold text-amber-700 hover:text-amber-900">All products</Link>
                     </CardHeader>
-                    <CardContent className="p-6">
-                        <div className="h-64 flex items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-50 via-teal-50 to-emerald-50 border-2 border-dashed border-emerald-200">
-                            <div className="text-center">
-                                <div className="mx-auto w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-3">
-                                    <Package className="h-8 w-8 text-emerald-600" />
-                                </div>
-                                <p className="text-sm font-semibold text-emerald-900">Chart coming soon</p>
-                                <p className="text-xs text-emerald-600 mt-1">Track your sales performance</p>
-                            </div>
-                        </div>
+                    <CardContent className="p-5">
+                        <p className="mb-3 text-xs text-gray-500">Best-selling products by units sold</p>
+                        {isLoading ? <div className="flex h-64 items-center justify-center text-sm text-gray-500">Loading sales...</div> : salesOverview.length ? (
+                            <ResponsiveContainer width="100%" height={256}>
+                                <BarChart data={salesOverview} margin={{ top: 8, right: 12, left: -16, bottom: 4 }}>
+                                    <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" vertical={false} />
+                                    <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} angle={-12} textAnchor="end" height={52} />
+                                    <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
+                                    <Tooltip formatter={(value) => [value, 'Units sold']} />
+                                    <Bar dataKey="units" name="Units sold" fill="#d97706" radius={[3, 3, 0, 0]} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        ) : <div className="flex h-64 items-center justify-center text-sm text-gray-500">No product sales data available.</div>}
                     </CardContent>
                 </Card>
             </div>
@@ -376,6 +397,7 @@ export default function Dashboard() {
                                         if (action.label === 'View Orders') navigate('/orders');
                                         if (action.label === 'Manage Users') navigate('/users');
                                         if (action.label === 'Add Product') navigate('/products/create');
+                                        if (action.label === 'View Reports') navigate('/reports');
                                     }}
                                     className={`group p-6 rounded-2xl border-2 border-gray-200 hover:border-transparent bg-gradient-to-br ${action.bg} hover:shadow-xl transition-all hover:-translate-y-1 relative overflow-hidden`}
                                 >

@@ -23,6 +23,11 @@ import EditOffer from './pages/offers/EditOffer';
 // Order Routes
 import Orders from './pages/orders/Orders';
 import OrderDetails from './pages/orders/OrderDetails';
+import Users from './pages/users/Users';
+import Returns from './pages/returns/Returns';
+import Shipping from './pages/shipping/Shipping';
+import Reports from './pages/reports/Reports';
+import Settings from './pages/settings/Settings';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -72,11 +77,11 @@ function App() {
                       {/* Order Routes */}
                       <Route path="/orders" element={<Orders />} />
                       <Route path="/orders/:id" element={<OrderDetails />} />
-                      <Route path="/users" element={<div className="text-2xl">Users (Coming Soon)</div>} />
-                      <Route path="/returns" element={<div className="text-2xl">Returns (Coming Soon)</div>} />
-                      <Route path="/shipping" element={<div className="text-2xl">Shipping (Coming Soon)</div>} />
-                      <Route path="/reports" element={<div className="text-2xl">Reports (Coming Soon)</div>} />
-                      <Route path="/settings" element={<div className="text-2xl">Settings (Coming Soon)</div>} />
+                      <Route path="/users" element={<Users />} />
+                      <Route path="/returns" element={<Returns />} />
+                      <Route path="/shipping" element={<Shipping />} />
+                      <Route path="/reports" element={<Reports />} />
+                      <Route path="/settings" element={<Settings />} />
                     </Routes>
                   </Layout>
                 </PrivateRoute>

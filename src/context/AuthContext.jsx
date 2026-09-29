@@ -52,11 +52,23 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
+    const updateUser = (userData) => {
+        const { token: refreshedToken, ...profileData } = userData;
+        const updatedUser = { ...user, ...profileData };
+        localStorage.setItem('adminUser', JSON.stringify(updatedUser));
+        setUser(updatedUser);
+        if (refreshedToken) {
+            localStorage.setItem('adminToken', refreshedToken);
+            setToken(refreshedToken);
+        }
+    };
+
     const value = {
         user,
         token,
         login,
         logout,
+        updateUser,
         isAuthenticated: !!token && !!user,
         loading
     };
