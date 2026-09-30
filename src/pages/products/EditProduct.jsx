@@ -20,6 +20,7 @@ import { Upload, X, Trash2 } from 'lucide-react';
 import api from '@/lib/api';
 import { getImageUrl } from '@/lib/utils';
 import ImageCropper from '@/components/ImageCropper';
+import { calculateDiscount, createSkuId, generateProductSku } from '@/lib/productPricing';
 
 export default function EditProduct() {
     const { id } = useParams();
@@ -41,7 +42,6 @@ export default function EditProduct() {
         description: '',
         mrp: '',
         price: '',
-        discount: '',
         categoryId: '',
         stock: '',
         images: [],
@@ -60,6 +60,7 @@ export default function EditProduct() {
     const [cropperOpen, setCropperOpen] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [deleteDialog, setDeleteDialog] = useState(false);
+    const [skuId, setSkuId] = useState(createSkuId);
 
 
 
@@ -75,7 +76,6 @@ export default function EditProduct() {
                 description: product.description || '',
                 mrp: product.mrp?.toString() || '',
                 price: product.price?.toString() || '',
-                discount: product.discount?.toString() || '',
                 categoryId: product.categoryId || '',
                 stock: product.stock?.toString() || '',
                 images: product.images || [],
@@ -182,6 +182,23 @@ export default function EditProduct() {
         }));
     };
 
+    const regenerateSku = () => {
+        const selectedCategory = categories.find(category => category._id === formData.categoryId);
+        const nextSkuId = createSkuId();
+        setSkuId(nextSkuId);
+        setFormData(prev => ({
+            ...prev,
+            sku: generateProductSku({
+                category: selectedCategory?.name,
+                name: formData.name,
+                unit: formData.packSize,
+                size: formData.availableSizes[0],
+                color: formData.availableColors[0],
+                id: nextSkuId,
+            }),
+        }));
+    };
+
     const validate = () => {
         const newErrors = {};
         if (!formData.sku.trim()) newErrors.sku = 'SKU is required';
@@ -232,7 +249,7 @@ export default function EditProduct() {
             keyPoints: parseList(formData.keyPoints),
             mrp: formData.mrp ? parseFloat(formData.mrp) : 0,
             price: parseFloat(formData.price),
-            discount: formData.discount ? parseFloat(formData.discount) : 0,
+            discount: calculateDiscount(formData.mrp, formData.price),
             stock: parseInt(formData.stock) || 0,
         };
 
@@ -324,21 +341,6 @@ export default function EditProduct() {
 
                                     <div className="space-y-5">
                                         <div>
-                                            <Label htmlFor="sku" className="text-sm font-medium text-gray-700 mb-2 block">
-                                                SKU (Stock Keeping Unit) <span className="text-red-500">*</span>
-                                            </Label>
-                                            <Input
-                                                id="sku"
-                                                name="sku"
-                                                value={formData.sku}
-                                                onChange={handleChange}
-                                                placeholder="e.g. LUG-SAR-001"
-                                                className={`border-gray-300 ${errors.sku ? 'border-red-500' : ''}`}
-                                            />
-                                            {errors.sku && <p className="text-sm text-red-500 mt-1">{errors.sku}</p>}
-                                        </div>
-
-                                        <div>
                                             <Label htmlFor="name" className="text-sm font-medium text-gray-700 mb-2 block">
                                                 Product name <span className="text-red-500">*</span>
                                             </Label>
@@ -350,6 +352,22 @@ export default function EditProduct() {
                                                 className={`border-gray-300 ${errors.name ? 'border-red-500' : ''}`}
                                             />
                                             {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name}</p>}
+                                        </div>
+
+                                        <div>
+                                            <Label htmlFor="sku" className="text-sm font-medium text-gray-700 mb-2 block">
+                                                Product SKU <span className="text-red-500">*</span>
+                                            </Label>
+                                            <div className="flex gap-2">
+                                                <Input id="sku" name="sku" value={formData.sku} onChange={handleChange} className={`border-gray-300 font-mono text-sm ${errors.sku ? 'border-red-500' : ''}`} />
+                                                <Button type="button" variant="outline" onClick={regenerateSku} className="shrink-0">Regenerate SKU</Button>
+                                            </div>
+                                            {errors.sku && <p className="text-sm text-red-500 mt-1">{errors.sku}</p>}
+                                        </div>
+
+                                        <div>
+                                            <Label htmlFor="packSize" className="text-sm font-medium text-gray-700 mb-2 block">Unit / Pack Size</Label>
+                                            <Input id="packSize" name="packSize" value={formData.packSize} onChange={handleChange} placeholder="e.g. 100 g, 250 ml, 30 capsules" className="border-gray-300" />
                                         </div>
 
                                         <div>
@@ -370,10 +388,6 @@ export default function EditProduct() {
                                             <div>
                                                 <Label htmlFor="subtitle" className="text-sm font-medium text-gray-700 mb-2 block">Subtitle</Label>
                                                 <Input id="subtitle" name="subtitle" value={formData.subtitle} onChange={handleChange} className="border-gray-300" />
-                                            </div>
-                                            <div>
-                                                <Label htmlFor="packSize" className="text-sm font-medium text-gray-700 mb-2 block">Pack Size</Label>
-                                                <Input id="packSize" name="packSize" value={formData.packSize} onChange={handleChange} className="border-gray-300" />
                                             </div>
                                         </div>
 
@@ -572,10 +586,12 @@ export default function EditProduct() {
                                                 id="discount"
                                                 name="discount"
                                                 type="number"
-                                                value={formData.discount}
-                                                onChange={handleChange}
-                                                className="border-gray-300"
+                                                value={calculateDiscount(formData.mrp, formData.price)}
+                                                readOnly
+                                                aria-describedby="discount-help"
+                                                className="border-gray-300 bg-gray-50 text-gray-600"
                                             />
+                                            <p id="discount-help" className="mt-1 text-xs text-gray-500">Calculated from MRP and offer price</p>
                                         </div>
 
                                         <div>

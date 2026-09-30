@@ -93,9 +93,9 @@ export default function Login() {
                             )}
                         </Button>
                     </form>
-                    <div className="mt-4 text-center text-sm text-gray-500">
+                    {/* <div className="mt-4 text-center text-sm text-gray-500">
                         Demo: admin@example.com / admin123
-                    </div>
+                    </div> */}
                 </CardContent>
             </Card>
         </div>

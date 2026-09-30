@@ -11,11 +11,13 @@ import { Upload, X } from 'lucide-react';
 import api from '@/lib/api';
 import { getImageUrl } from '@/lib/utils';
 import ImageCropper from '@/components/ImageCropper';
+import { calculateDiscount, createSkuId, generateProductSku } from '@/lib/productPricing';
 
 export default function CreateProduct() {
     const navigate = useNavigate();
     const createMutation = useCreateProduct();
     const { data: categories = [] } = useCategories();
+    const [skuId, setSkuId] = useState(createSkuId);
 
     const [sections, setSections] = useState([
         { title: 'How to Use', content: '' },
@@ -25,7 +27,6 @@ export default function CreateProduct() {
     ]);
 
     const [formData, setFormData] = useState({
-        sku: '',
         name: '',
         subtitle: '',
         shortDescription: '',
@@ -34,7 +35,6 @@ export default function CreateProduct() {
         description: '',
         mrp: '',
         price: '',
-        discount: '',
         categoryId: '',
         stock: '',
         images: [],
@@ -52,6 +52,16 @@ export default function CreateProduct() {
     const [uploadingImage, setUploadingImage] = useState(false);
     const [cropperOpen, setCropperOpen] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
+
+    const selectedCategory = categories.find(category => category._id === formData.categoryId);
+    const generatedSku = generateProductSku({
+        category: selectedCategory?.name,
+        name: formData.name,
+        unit: formData.packSize,
+        size: formData.availableSizes[0],
+        color: formData.availableColors[0],
+        id: skuId,
+    });
 
 
 
@@ -149,7 +159,7 @@ export default function CreateProduct() {
 
     const validate = () => {
         const newErrors = {};
-        if (!formData.sku.trim()) newErrors.sku = 'SKU is required';
+        if (!generatedSku) newErrors.sku = 'SKU could not be generated';
         if (!formData.name.trim()) newErrors.name = 'Product name is required';
         if (!formData.price) newErrors.price = 'Price is required';
         if (!formData.categoryId) newErrors.categoryId = 'Category is required';
@@ -188,6 +198,7 @@ export default function CreateProduct() {
 
         const productData = {
             ...formData,
+            sku: generatedSku,
             subtitle: formData.subtitle?.trim(),
             shortDescription: formData.shortDescription?.trim(),
             packSize: formData.packSize?.trim(),
@@ -203,7 +214,7 @@ export default function CreateProduct() {
             keyPoints: parseList(formData.keyPoints),
             mrp: formData.mrp ? parseFloat(formData.mrp) : 0,
             price: parseFloat(formData.price),
-            discount: formData.discount ? parseFloat(formData.discount) : 0,
+            discount: calculateDiscount(formData.mrp, formData.price),
             stock: parseInt(formData.stock) || 0,
         };
 
@@ -256,21 +267,6 @@ export default function CreateProduct() {
 
                                     <div className="space-y-5">
                                         <div>
-                                            <Label htmlFor="sku" className="text-sm font-medium text-gray-700 mb-2 block">
-                                                SKU (Stock Keeping Unit) <span className="text-red-500">*</span>
-                                            </Label>
-                                            <Input
-                                                id="sku"
-                                                name="sku"
-                                                value={formData.sku}
-                                                onChange={handleChange}
-                                                placeholder="e.g. AYV-FIB-150"
-                                                className={`border-gray-300 ${errors.sku ? 'border-red-500' : ''}`}
-                                            />
-                                            {errors.sku && <p className="text-sm text-red-500 mt-1">{errors.sku}</p>}
-                                        </div>
-
-                                        <div>
                                             <Label htmlFor="name" className="text-sm font-medium text-gray-700 mb-2 block">
                                                 Product name <span className="text-red-500">*</span>
                                             </Label>
@@ -283,6 +279,32 @@ export default function CreateProduct() {
                                                 className={`border-gray-300 ${errors.name ? 'border-red-500' : ''}`}
                                             />
                                             {errors.name && <p className="text-sm text-red-500 mt-1">{errors.name}</p>}
+                                        </div>
+
+                                        <div>
+                                            <Label htmlFor="sku" className="text-sm font-medium text-gray-700 mb-2 block">
+                                                Product SKU <span className="text-red-500">*</span>
+                                            </Label>
+                                            <div className="flex gap-2">
+                                                <Input id="sku" name="sku" value={generatedSku} readOnly className="border-gray-300 bg-gray-50 font-mono text-sm" />
+                                                <Button type="button" variant="outline" onClick={() => setSkuId(createSkuId())} className="shrink-0">Regenerate</Button>
+                                            </div>
+                                            <p className="mt-1 text-xs text-gray-500">Generated from category, product, unit, and selected options.</p>
+                                            {errors.sku && <p className="text-sm text-red-500 mt-1">{errors.sku}</p>}
+                                        </div>
+
+                                        <div>
+                                            <Label htmlFor="packSize" className="text-sm font-medium text-gray-700 mb-2 block">
+                                                Unit / Pack Size
+                                            </Label>
+                                            <Input
+                                                id="packSize"
+                                                name="packSize"
+                                                value={formData.packSize}
+                                                onChange={handleChange}
+                                                placeholder="e.g. 100 g, 250 ml, 30 capsules"
+                                                className="border-gray-300"
+                                            />
                                         </div>
 
                                         <div>
@@ -316,19 +338,6 @@ export default function CreateProduct() {
                                                 />
                                             </div>
 
-                                            <div>
-                                                <Label htmlFor="packSize" className="text-sm font-medium text-gray-700 mb-2 block">
-                                                    Pack Size
-                                                </Label>
-                                                <Input
-                                                    id="packSize"
-                                                    name="packSize"
-                                                    value={formData.packSize}
-                                                    onChange={handleChange}
-                                                    placeholder="e.g. 250 g | 500 g"
-                                                    className="border-gray-300"
-                                                />
-                                            </div>
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -576,11 +585,12 @@ export default function CreateProduct() {
                                                 id="discount"
                                                 name="discount"
                                                 type="number"
-                                                value={formData.discount}
-                                                onChange={handleChange}
-                                                placeholder="0"
-                                                className="border-gray-300"
+                                                value={calculateDiscount(formData.mrp, formData.price)}
+                                                readOnly
+                                                aria-describedby="discount-help"
+                                                className="border-gray-300 bg-gray-50 text-gray-600"
                                             />
+                                            <p id="discount-help" className="mt-1 text-xs text-gray-500">Calculated from MRP and offer price</p>
                                         </div>
 
                                         <div>
