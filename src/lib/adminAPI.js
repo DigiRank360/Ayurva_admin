@@ -17,6 +17,30 @@ export const adminAPI = {
         const response = await api.get('/admin/users');
         return response.data;
     },
+    getMlmKycQueue: async (status = 'submitted') => {
+        const response = await api.get('/mlm/admin/kyc', { params: { status } });
+        return response.data;
+    },
+    getMlmKycConfig: async () => {
+        const response = await api.get('/mlm/admin/kyc/config');
+        return response.data;
+    },
+    downloadMlmKycDocument: async (kycId, type) => {
+        const response = await api.get(`/mlm/admin/kyc/${kycId}/documents/${type}`, { responseType: 'blob' });
+        return response.data;
+    },
+    reviewMlmKyc: async (kycId, payload) => {
+        const response = await api.put(`/mlm/admin/kyc/${kycId}/review`, payload);
+        return response.data;
+    },
+    getMlmPackagePayments: async (status = 'verified') => {
+        const response = await api.get('/mlm/admin/package-payments', { params: { status } });
+        return response.data;
+    },
+    reviewMlmPackagePayment: async (paymentId, payload) => {
+        const response = await api.put(`/mlm/admin/package-payments/${paymentId}/review`, payload);
+        return response.data;
+    },
     toggleUserAdmin: async (id) => {
         const response = await api.put(`/admin/users/${id}/toggle`);
         return response.data;

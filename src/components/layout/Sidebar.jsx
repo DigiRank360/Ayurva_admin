@@ -16,7 +16,9 @@ import {
     Settings,
     Store,
     X,
-    Sparkles
+    Sparkles,
+    ShieldCheck,
+    BadgeIndianRupee,
 } from 'lucide-react';
 
 export default function Sidebar({ onClose }) {
@@ -28,6 +30,8 @@ export default function Sidebar({ onClose }) {
         { name: 'Categories', path: '/categories', icon: FolderTree, color: 'from-orange-500 to-red-500' },
         { name: 'Orders', path: '/orders', icon: ShoppingCart, color: 'from-green-500 to-emerald-500' },
         { name: 'Users', path: '/users', icon: Users, color: 'from-indigo-500 to-purple-500' },
+        { name: 'MLM KYC', path: '/mlm-kyc', icon: ShieldCheck, color: 'from-emerald-500 to-teal-500' },
+        { name: 'MLM Payments', path: '/mlm-payments', icon: BadgeIndianRupee, color: 'from-amber-500 to-orange-500' },
         { name: 'Returns', path: '/returns', icon: RefreshCw, color: 'from-yellow-500 to-orange-500' },
         { name: 'Shipping', path: '/shipping', icon: Truck, color: 'from-teal-500 to-cyan-500' },
         { name: 'Banners', path: '/banners', icon: Image, color: 'from-pink-500 to-rose-500' },

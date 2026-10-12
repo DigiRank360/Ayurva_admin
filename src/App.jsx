@@ -28,6 +28,8 @@ import Returns from './pages/returns/Returns';
 import Shipping from './pages/shipping/Shipping';
 import Reports from './pages/reports/Reports';
 import Settings from './pages/settings/Settings';
+import MlmKycReview from './pages/mlm/MlmKycReview';
+import MlmPaymentReview from './pages/mlm/MlmPaymentReview';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -82,6 +84,8 @@ function App() {
                       <Route path="/shipping" element={<Shipping />} />
                       <Route path="/reports" element={<Reports />} />
                       <Route path="/settings" element={<Settings />} />
+                      <Route path="/mlm-kyc" element={<MlmKycReview />} />
+                      <Route path="/mlm-payments" element={<MlmPaymentReview />} />
                     </Routes>
                   </Layout>
                 </PrivateRoute>
