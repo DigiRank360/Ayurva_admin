@@ -110,7 +110,7 @@ export default function EditBanner() {
         else setUploadingMobileImage(true);
 
         try {
-            const { data } = await api.post('/upload', formDataToUpload, {
+            const { data } = await api.post('/upload/banner', formDataToUpload, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
